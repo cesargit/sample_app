@@ -46,5 +46,17 @@ end
       reponse.should have_selector("title", 
                 :content => "#{@base_title} | About")                 
   end
+
+  describe "GET 'help'" do
+    it "should be_succes"
+    get 'help'
+    response.should be_success
+  end
+      it "shoud have the right title" do
+      get 'help'
+      reponse.should have_selector("title", 
+                :content => "#{@base_title} | Help")                 
+  end
+
 end
 end
