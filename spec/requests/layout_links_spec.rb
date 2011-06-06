@@ -1,3 +1,4 @@
+
 require 'spec_helper'
 
 describe "LayoutLinks" do
@@ -38,6 +39,5 @@ it "should have a Contact page at '/contact'" do
         click_link "Sign Up Now!"
         response.should have_selector('title', :content => "Sign Up") 
         response.should have_selector('a[href="/"]>img')
-        end
-        
+        end       
 end
