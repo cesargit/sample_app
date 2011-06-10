@@ -5,7 +5,12 @@ describe User do
   before User do
     
     before(:each) do
-      @attr = { :name => "Example User", :email => "user@example.com"}
+      @attr = { 
+                :name => "Example User", 
+                :email => "user@example.com",
+                :password => "foobar",       
+                :password_conformation => "foobar"
+                }
     end
   
   it "should create a new instance give a valid attribute" do
@@ -54,5 +59,44 @@ describe User do
      User.create!(@attr.merge( :email => upcased_email))
      user_with_duplicate_email = User.new(@attr)
      user_with_duplicate_email.should_not be_valid
-   end
+   end    
+   describe "passwords" do
+     
+     before(:each) do
+       @user = User.new(@attr)
+     end
+                           
+     it "should have a password attribute" do
+       @user.should respond_to( :password)
+     end                                  
+     
+     it "shoudl have a password conformation attribute" do
+       @user.should respond_to(:password_conformation)
+     end
+   end  
+   
+   describe "password validations" do
+     it "should require a password" do
+       User.new(@attr.merge(:password => "", :password_conformation =>"")).
+       should_no be_valid
+     end
+     
+     it "should require a matching conformation" do
+       User.new(@attr.merge(:passwork_conformation => "invalid")).
+       should_not be_valid
+     end
+      
+   
+     it "should reject short passwords" do
+       short = "a" * 5
+       hash = @attr.merge(:password => short, :password_conformation => short)
+       User.new(hash).should_not be_valid
+     end
+     
+     it "should reject short passwords" do
+        long = "a" * 41
+        hash = @attr.merge(:password => long, :password_conformation => long)
+        User.new(hash).should_not be_valid
+      end   
+    end
 end
