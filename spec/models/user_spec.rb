@@ -9,7 +9,7 @@ describe User do
                 :name => "Example User", 
                 :email => "user@example.com",
                 :password => "foobar",       
-                :password_conformation => "foobar"
+                :password_confirmation => "foobar"
                 }
     end
   
@@ -70,33 +70,85 @@ describe User do
        @user.should respond_to( :password)
      end                                  
      
-     it "shoudl have a password conformation attribute" do
-       @user.should respond_to(:password_conformation)
+     it "shoudl have a password confirmation attribute" do
+       @user.should respond_to(:password_confirmation)
      end
    end  
    
    describe "password validations" do
      it "should require a password" do
-       User.new(@attr.merge(:password => "", :password_conformation =>"")).
+       User.new(@attr.merge(:password => "", :password_confirmation =>"")).
        should_no be_valid
      end
      
-     it "should require a matching conformation" do
-       User.new(@attr.merge(:passwork_conformation => "invalid")).
+     it "should require a matching confirmation" do
+       User.new(@attr.merge(:passwork_confirmation => "invalid")).
        should_not be_valid
      end
       
    
      it "should reject short passwords" do
        short = "a" * 5
-       hash = @attr.merge(:password => short, :password_conformation => short)
+       hash = @attr.merge(:password => short, :password_confirmation => short)
        User.new(hash).should_not be_valid
      end
      
      it "should reject short passwords" do
         long = "a" * 41
-        hash = @attr.merge(:password => long, :password_conformation => long)
+        hash = @attr.merge(:password => long, :password_confirmation => long)
         User.new(hash).should_not be_valid
       end   
+    end 
+    
+    describe "password encryption" do
+      
+      before (:each) do
+        @user = User.create!(@attr)
+      end
+         
+    it "should have an encrypted password attribute" do
+      @user.should respond_to(:encrypted_password)
     end
-end
+    
+    it "should set the encrypted password" do
+      @user.encrypted_password.should_not be_blank
+    end   
+    
+    it "should have a salt" do
+    @user.should respond_to(:salt)
+    end
+   
+   describe "has_password? method" do
+     
+     it "should exist" do
+       @user.should repond_to(:has_password?) 
+   end   
+     
+     it "should return true if the passwords match" do
+       @user.has_password?(@attr[:password]).should be_true
+       end
+     it "should return false if the passwords don't match" do
+        @user.has_password?("invalid").should be_false
+          end
+        end    
+        
+        describe "authenticate method" do  
+          
+        it "should exist" do
+          User.should respond_to(:authenticate)  
+          
+        it "should return nil on email/password mismatch" do
+          User.authenticate(@attr[:email], "wrongpass").should be_nil
+          end
+          
+        it "should return nil for an email with no user" do
+          User.authenticate("bar@foo.com", @attr[:password]).should be_nil
+          end
+        
+        it "should return the user on email/password match" do
+          User.authenticate(@attr[:email], @attr[:password]).should == @user
+          end    
+       end
+      end
+    end
+    
